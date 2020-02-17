@@ -21,7 +21,7 @@ A typical LCD has the following pinouts:
    | | | | | | | | | | | | | | |  _ LED NEGATIVE
    | | | | | | | | | | | | | | | |
    | | | | | | | | | | | | | | | |
- __|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_________________________________
+ __|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|___________________
 |+ 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0                  +|
 |  ________________________________________________  |
 |  ________________________________________________  |
@@ -32,16 +32,16 @@ A typical LCD has the following pinouts:
 
 (For comprehensive info, search up "Hitachi HD44780 LCD Datasheet", HD44780 is the driver that is typically used in LCDs)
 
-What you would do with the above pinouts, is that VSS get connected to ground and VDD to +5V of a power supply.
-VE is used to adjust contrast. Connect it to +5V to get the maximum contrast or to ground to get the minimum contrast.
+What you would do with the above pinouts, is that VSS gets connected to ground and VDD to +5V of the power supply.
+VE pin is used to adjust contrast. Connect it to +5V to get the maximum contrast or to ground to get the minimum contrast.
 What you might want to do is to use a potentiometer in a voltage divider circuit to get an adjustable contrast with the potentiometer.
-The next 3 pins, namely Register Select, Read/Write and Enable should be connected to 3 pins of our microcontroller (in output mode).
+The next 3 pins, namely Register Select, Read/Write and Enable should wire up to 3 pins of our microcontroller (in output mode).
 these three pins are used by the LCD to be inform on what to do with the data that is passed to it (via next 8 data pins).
-Next 8/4 pins (depending on what we want), gets connected to another 8/4 pins of our microcontroller.
-These pins are used by the LCD to pass the actual data or command to the LCD.  
+Next 8/4 pins (depending on what mode you want to use the LCD), get connected to another 8/4 pins of the microcontroller. These pins
+are used by the LCD to pass the actual data or command to the LCD.
 Last two pins are the backlight LEDs, which your LCD may use or not. 
 
-After the wiring, we can use the following instruction code to send commands to our LCD.
+After the wirings, we can use the following instruction code to send commands to our LCD.
 
 Instruction Table is as follows;
   Instruction            |  RS  |  R/W  |  DB7  |  DB6  |  DB5  |  DB4  |  DB3  |  DB2  |  DB1  |  DB0  |  Description |
@@ -56,6 +56,30 @@ Instruction Table is as follows;
   Read Busy flag/Addr    |   0  |   1   |   BF  |  AC6  |  AC5  |  AC4  |  AC3  |  AC2  |  AC1  |  AC0  |      *9      |
   Write Data to Address  |   1  |   0   |   D7  |   D6  |   D5  |   D4  |   D3  |   D2  |   D1  |   D0  |      *10     |
   Read Data from Address |   0  |   1   |   D7  |   D6  |   D5  |   D4  |   D3  |   D2  |   D1  |   D0  |      *11     |
+
+For example, assuming PORTB is the 8/4 bit data port, following line:
+
+PORTB = 0x01;
+
+Outputs '0000 0001' on PORTB which executes clearscreen command on the LCD. Something to note here is that
+to make that command execute, the Enable Signal should be triggered. To do so, simply set it to off, and with 
+a little delay set it on again. This procedure can be done with the following lines (assuming PORTC is the control port):
+
+PORTC = (0<<0)|(0<<1)|(1<<2);
+_delay_ms(1);
+PORTC = (0<<0)|(0<<1)|(0<<2);
+
+Often macros are defining instead of using the actual pin number in shifiting section. That is:
+
+#define rs PINC0
+#define rw PINC1
+#define en PINC2
+
+Consequently, Switching on and off the Enable signal could be replaced with these commands instead:
+
+PORTC = (0<<0)|(0<<1)|(1<<2);
+_delay_ms(1);
+PORTC = (0<<0)|(0<<1)|(0<<2);
 
 */
 
@@ -75,13 +99,13 @@ Instruction Table is as follows;
 // Defining macros for frequenty used instructions:
 
 #define LCD_CLEARSCREEN 0x01 
-// 00 0000 0001
+// 0000 0001
 
 #define LCD_SET_8_BIT_MODE 0x38
-// 00 0011 1000 -> Sets interface 8bit ...
+// 0011 1000 -> Sets interface 8bit ...
 
 #define LCD_TURN_ON 0x0E
- // 0x0E = 00 0000 1110 -> 00 0000 1DCB -> sets display/cursor/blinking ON/OFF. Where DCB stand for:
+ // 0x0E = 0000 1110 -> 0000 1DCB -> sets display/cursor/blinking ON/OFF. Where DCB stand for:
  // display(D), cursor(C), and blinking of cursor(B) on/off control bit
  
 #define LCD_TURN_OFF 0x00
