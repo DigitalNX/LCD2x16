@@ -35,10 +35,13 @@ A typical LCD has the following pinouts:
 
 (For comprehensive info, search up "Hitachi HD44780 LCD Datasheet", HD44780 is the driver that is typically used in LCDs)
 
-What you would do with the above pinouts, is that VSS gets connected to ground and VDD to +5V of the power supply. VE pin is used to adjust contrast. Connect it to +5V to get the maximum contrast or to ground to get the minimum contrast. What you might want to do is to use a potentiometer in a voltage divider circuit to get an adjustable contrast with the potentiometer.
+What you would do with the above pinouts, is that VSS gets connected to ground and VDD to +5V of the power supply.
+VE pin is used to adjust contrast. Connect it to +5V to get the maximum contrast or to ground to get the minimum contrast.
+What you might want to do is to use a potentiometer in a voltage divider circuit to get an adjustable contrast with the potentiometer.
 The next 3 pins, namely Register Select, Read/Write and Enable should wire up to 3 pins of our microcontroller (in output mode).
 these three pins are used by the LCD to be inform on what to do with the data that is passed to it (via next 8 data pins).
-Next 8/4 pins (depending on what mode you want to use the LCD), get connected to another 8/4 pins of the microcontroller. These pins are used by the LCD to pass the actual data or command to the LCD.
+Next 8/4 pins (depending on what mode you want to use the LCD), get connected to another 8/4 pins of the microcontroller. These pins
+are used by the LCD to pass the actual data or command to the LCD.
 Last two pins are the backlight LEDs, which your LCD may use or not. 
 
 After the wirings, we can use the following instruction code to send commands to our LCD.
@@ -80,5 +83,6 @@ Consequently, Switching on and off the Enable signal could be replaced with thes
 PORTC = (0<<0)|(0<<1)|(1<<2);
 _delay_ms(1);
 PORTC = (0<<0)|(0<<1)|(0<<2);
+
 
 ```
